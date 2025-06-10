@@ -1,0 +1,319 @@
+_seed: 12345
+
+tables:
+  customer:
+    # This table contains customer information
+    # It has a large number of records to simulate a real-world scenario
+    count: 50000
+    fields:
+      customer_id: {type: int, primary_key: true, auto_increment: true}
+      first_name: {faker: first_name}
+      last_name: {faker: last_name}
+      gender: {faker: random_element, args: ['Male','Feamle', 'None']}
+      date_of_birth: {faker: date_of_birth, args: [18, 65]}
+      city: {faker: city}
+      state: {faker: state}
+      country: {faker: country}
+      signup_date: {faker: date_time_this_decade}
+  rate_plan:
+    # This table contains rate plan information
+    # It has a moderate number of records to simulate different plans available
+    count: 500
+    fields:
+      plan_id: {type: int, primary_key: true, auto_increment: true}
+      plan_name: {faker: word}
+      plan_type: {faker: random_element, args: ['Prepaid', 'Postpaid']}
+      monthly_cost: {faker: random_int, args: [10, 100]}
+      data_limit_gb: {faker: random_int, args: [1, 100]}
+      call_minutes_limit: {faker: random_int, args: [50, 5000]}
+  subscription:
+    # This table links customers to their rate plans
+    # It has a large number of records to simulate customer subscriptions
+    count: 50000
+    fields:
+      subscription_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      plan_id: {type: int, foreign_key: rate_plan.plan_id}
+      start_date: {faker: date_time_this_decade}
+      end_date: {faker: date_time_this_decade, args: [start_date]}
+      status: {faker: random_element, args: ['Active', 'Inactive', 'Cancelled']}
+  call_record:
+    # This table contains call records for customers
+    # It has a very large number of records to simulate real-world call data
+    count: 1000000
+    fields:
+      call_id: {type: int, primary_key: true, auto_increment: true}
+      subscription_id: {type: int, foreign_key: subscription.subscription_id}
+      call_date: {faker: date_time_this_decade}
+      duration_seconds: {faker: random_int, args: [30, 3600]}  # Call duration between 30 seconds and 1 hour
+      call_type: {faker: random_element, args: ['Incoming', 'Outgoing', 'Missed']}
+      call_cost: {faker: random_int, args: [0, 10]}  # Cost in dollars
+  payment:
+    # This table contains payment records for customer subscriptions
+    # It has a large number of records to simulate various payment transactions
+    count: 200000
+    fields:
+      payment_id: {type: int, primary_key: true, auto_increment: true}
+      subscription_id: {type: int, foreign_key: subscription.subscription_id}
+      payment_date: {faker: date_time_this_decade}
+      amount: {faker: random_int, args: [5, 500]}  # Payment amount in dollars
+      payment_method: {faker: random_element, args: ['Credit Card', 'Debit Card', 'PayPal', 'Bank Transfer']}
+      status: {faker: random_element, args: ['Completed', 'Pending', 'Failed']}
+  device:
+    # This table contains information about devices used by customers
+    # It has a moderate number of records to simulate different devices
+    count: 10000
+    fields:
+      device_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      device_type: {faker: random_element, args: ['Smartphone', 'Tablet', 'Laptop', 'Desktop']}
+      brand: {faker: company}
+      model: {faker: word}
+      purchase_date: {faker: date_time_this_decade}
+      warranty_expiration_date: {faker: date_time_this_decade, args: [purchase_date, 2]}  # Warranty for 2 years
+  support_ticket:
+    # This table contains support tickets raised by customers
+    # It has a large number of records to simulate customer support interactions
+    count: 50000
+    fields:
+      ticket_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      issue_description: {faker: sentence, args: [10]}
+      ticket_date: {faker: date_time_this_decade}
+      status: {faker: random_element, args: ['Open', 'In Progress', 'Resolved', 'Closed']}
+      resolution_date: {faker: date_time_this_decade, args: [ticket_date]}  # Resolution date after ticket date
+      resolution_notes: {faker: paragraph, args: [3]}  # Notes on how the issue was resolved
+  network_usage:
+    # This table contains network usage statistics for customers
+    # It has a large number of records to simulate data usage patterns
+    count: 500000
+    fields:
+      usage_id: {type: int, primary_key: true, auto_increment: true}
+      subscription_id: {type: int, foreign_key: subscription.subscription_id}
+      usage_date: {faker: date_time_this_decade}
+      data_used_mb: {faker: random_int, args: [10, 10000]}  # Data used in megabytes
+      peak_usage_time: {faker: time_of_day}  # Time of day when peak usage occurred
+      network_type: {faker: random_element, args: ['4G', '5G', 'Wi-Fi']}
+  feedback:
+    # This table contains customer feedback on services
+    # It has a moderate number of records to simulate customer satisfaction surveys
+    count: 20000
+    fields:
+      feedback_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      feedback_date: {faker: date_time_this_decade}
+      rating: {faker: random_int, args: [1, 5]}  # Rating from 1 to 5
+      comments: {faker: paragraph, args: [2]}  # Customer comments on the service
+      follow_up_required: {faker: boolean}  # Whether follow-up is needed
+  promotion:
+    # This table contains promotional offers available to customers
+    # It has a moderate number of records to simulate various promotions
+    count: 1000
+    fields:
+      promotion_id: {type: int, primary_key: true, auto_increment: true}
+      promotion_name: {faker: word}
+      description: {faker: sentence, args: [10]}
+      start_date: {faker: date_time_this_decade}
+      end_date: {faker: date_time_this_decade, args: [start_date]}  # End date after start date
+      discount_percentage: {faker: random_int, args: [5, 50]}  # Discount percentage
+      applicable_plans: {faker: random_element, args: ['All Plans', 'Prepaid Only', 'Postpaid Only']}
+  customer_feedback:
+    # This table contains detailed customer feedback records
+    # It has a moderate number of records to simulate detailed feedback
+    count: 30000
+    fields:
+      feedback_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      feedback_date: {faker: date_time_this_decade}
+      service_type: {faker: random_element, args: ['Mobile', 'Internet', 'Customer Service']}
+      satisfaction_level: {faker: random_element, args: ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']}
+      comments: {faker: paragraph, args: [3]}  # Detailed comments from the customer
+      follow_up_required: {faker: boolean}  # Whether follow-up is needed
+  call_charges:
+    # This table contains call charges for customers
+    # It has a large number of records to simulate detailed call charge data
+    count: 500000
+    fields:
+      charge_id: {type: int, primary_key: true, auto_increment: true}
+      call_id: {type: int, foreign_key: call_record.call_id}
+      charge_date: {faker: date_time_this_decade}
+      charge_amount: {faker: random_int, args: [0, 20]}  # Charge amount in dollars
+      charge_type: {faker: random_element, args: ['Local', 'International', 'Roaming']}
+      description: {faker: sentence, args: [10]}  # Description of the charge
+  device_usage:
+    # This table contains device usage statistics for customers
+    # It has a moderate number of records to simulate device usage patterns
+    count: 100000
+    fields:
+      usage_id: {type: int, primary_key: true, auto_increment: true}
+      device_id: {type: int, foreign_key: device.device_id}
+      usage_date: {faker: date_time_this_decade}
+      screen_time_minutes: {faker: random_int, args: [10, 480]}  # Screen time in minutes
+      app_usage_details: {faker: sentence, args: [5]}  # Details of app usage
+      data_used_mb: {faker: random_int, args: [1, 5000]}  # Data used in megabytes
+  customer_location:
+    # This table contains customer location data
+    # It has a large number of records to simulate customer locations
+    count: 50000
+    fields:
+      location_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      latitude: {faker: latitude}
+      longitude: {faker: longitude}
+      last_updated: {faker: date_time_this_decade}
+      accuracy: {faker: random_int, args: [1, 100]}  # Accuracy in meters
+  customer_preferences:
+    # This table contains customer preferences for services
+    # It has a moderate number of records to simulate customer preferences
+    count: 20000
+    fields:
+      preference_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      preference_type: {faker: random_element, args: ['SMS Alerts', 'Email Notifications', 'App Notifications']}
+      preference_value: {faker: boolean}  # Whether the preference is enabled or not
+      last_updated: {faker: date_time_this_decade}
+      notes: {faker: sentence, args: [5]}  # Additional notes on the preference
+  customer_activity_log:
+    # This table contains logs of customer activities
+    # It has a large number of records to simulate customer interactions
+    count: 100000
+    fields:
+      activity_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      activity_type: {faker: random_element, args: ['Login', 'Logout', 'Plan Change', 'Payment Made']}
+      activity_date: {faker: date_time_this_decade}
+      details: {faker: sentence, args: [10]}  # Details of the activity
+      ip_address: {faker: ipv4}  # IP address from which the activity was performed
+  customer_alerts:
+    # This table contains alerts sent to customers
+    # It has a moderate number of records to simulate customer alerts
+    count: 30000
+    fields:
+      alert_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      alert_date: {faker: date_time_this_decade}
+      alert_type: {faker: random_element, args: ['Service Update', 'Billing Alert', 'Promotional Offer']}
+      message: {faker: sentence, args: [10]}  # Message content of the alert
+      read_status: {faker: boolean}  # Whether the alert has been read by the customer
+  customer_loyalty:
+    # This table contains loyalty program information for customers
+    # It has a moderate number of records to simulate loyalty program participation
+    count: 10000
+    fields:
+      loyalty_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      loyalty_points: {faker: random_int, args: [0, 10000]}  # Points accumulated in the loyalty program
+      membership_level: {faker: random_element, args: ['Bronze', 'Silver', 'Gold', 'Platinum']}
+      last_updated: {faker: date_time_this_decade}
+      notes: {faker: sentence, args: [5]}  # Additional notes on the loyalty program status
+  customer_referral:
+    # This table contains referral information for customers
+    # It has a moderate number of records to simulate customer referrals
+    count: 5000
+    fields:
+      referral_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      referred_customer_id: {type: int, foreign_key: customer.customer_id}
+      referral_date: {faker: date_time_this_decade}
+      status: {faker: random_element, args: ['Pending', 'Accepted', 'Rejected']}
+      reward_amount: {faker: random_int, args: [0, 100]}  # Reward amount for successful referrals
+  customer_notifications:
+    # This table contains notifications sent to customers
+    # It has a moderate number of records to simulate customer notifications
+    count: 20000
+    fields:
+      notification_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      notification_date: {faker: date_time_this_decade}
+      notification_type: {faker: random_element, args: ['System Update', 'Service Alert', 'Promotional Offer']}
+      message: {faker: sentence, args: [10]}  # Message content of the notification
+      read_status: {faker: boolean}  # Whether the notification has been read by the customer
+  customer_survey:
+    # This table contains survey responses from customers
+    # It has a moderate number of records to simulate customer surveys
+    count: 15000
+    fields:
+      survey_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      survey_date: {faker: date_time_this_decade}
+      survey_type: {faker: random_element, args: ['Satisfaction', 'Feedback', 'Market Research']}
+      responses: {faker: sentence, args: [5]}  # Customer responses to the survey questions
+      follow_up_required: {faker: boolean}  # Whether follow-up is needed based on survey responses
+  customer_subscription_history:
+    # This table contains historical subscription data for customers
+    # It has a moderate number of records to simulate subscription changes over time
+    count: 30000
+    fields:
+      history_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      plan_id: {type: int, foreign_key: rate_plan.plan_id}
+      change_date: {faker: date_time_this_decade}
+      previous_plan_id: {type: int, foreign_key: rate_plan.plan_id}  # Previous plan before the change
+      change_reason: {faker: sentence, args: [5]}  # Reason for the subscription change
+  customer_billing_history:
+    # This table contains historical billing data for customers
+    # It has a moderate number of records to simulate billing changes over time
+    count: 30000
+    fields:
+      billing_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      billing_date: {faker: date_time_this_decade}
+      amount_billed: {faker: random_int, args: [5, 500]}  # Amount billed in dollars
+      payment_status: {faker: random_element, args: ['Paid', 'Pending', 'Overdue']}
+      billing_cycle_start: {faker: date_time_this_decade}
+      billing_cycle_end: {faker: date_time_this_decade, args: [billing_cycle_start]}  # End date after start date
+  customer_device_history:
+    # This table contains historical device data for customers
+    # It has a moderate number of records to simulate device changes over time
+    count: 20000
+    fields:
+      device_history_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      device_id: {type: int, foreign_key: device.device_id}
+      change_date: {faker: date_time_this_decade}
+      previous_device_id: {type: int, foreign_key: device.device_id}  # Previous device before the change
+      change_reason: {faker: sentence, args: [5]}  # Reason for the device change
+  customer_support_history:
+    # This table contains historical support ticket data for customers
+    # It has a moderate number of records to simulate support interactions over time
+    count: 20000
+    fields:
+      support_history_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      ticket_id: {type: int, foreign_key: support_ticket.ticket_id}
+      interaction_date: {faker: date_time_this_decade}
+      previous_ticket_id: {type: int, foreign_key: support_ticket.ticket_id}  # Previous ticket before the interaction
+      resolution_notes: {faker: paragraph, args: [3]}  # Notes on how the issue was resolved
+  customer_network_history:
+    # This table contains historical network usage data for customers
+    # It has a moderate number of records to simulate network usage changes over time
+    count: 30000
+    fields:
+      network_history_id: {type: int, primary_key: true, auto_increment: true}
+      subscription_id: {type: int, foreign_key: subscription.subscription_id}
+      usage_date: {faker: date_time_this_decade}
+      data_used_mb: {faker: random_int, args: [10, 10000]}  # Data used in megabytes
+      peak_usage_time: {faker: time_of_day}  # Time of day when peak usage occurred
+      network_type: {faker: random_element, args: ['4G', '5G', 'Wi-Fi']}
+  customer_payment_history:
+    # This table contains historical payment data for customers
+    # It has a moderate number of records to simulate payment changes over time
+    count: 30000
+    fields:
+      payment_history_id: {type: int, primary_key: true, auto_increment: true}
+      subscription_id: {type: int, foreign_key: subscription.subscription_id}
+      payment_date: {faker: date_time_this_decade}
+      amount: {faker: random_int, args: [5, 500]}  # Payment amount in dollars
+      payment_method: {faker: random_element, args: ['Credit Card', 'Debit Card', 'PayPal', 'Bank Transfer']}
+      status: {faker: random_element, args: ['Completed', 'Pending', 'Failed']}
+  customer_promotion_history:
+    # This table contains historical promotion data for customers
+    # It has a moderate number of records to simulate promotion changes over time
+    count: 10000
+    fields:
+      promotion_history_id: {type: int, primary_key: true, auto_increment: true}
+      customer_id: {type: int, foreign_key: customer.customer_id}
+      promotion_id: {type: int, foreign_key: promotion.promotion_id}
+      redemption_date: {faker: date_time_this_decade}
+      previous_promotion_id: {type: int, foreign_key: promotion.promotion_id}  # Previous promotion before the redemption
+      notes: {faker: sentence, args: [5]}  # Additional notes on the promotion redemption
